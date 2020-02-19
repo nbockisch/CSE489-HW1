@@ -1,4 +1,6 @@
-import ecash,
+import ecash
+import string
+from random import randint
 
 class customer:
     cash = []
@@ -8,4 +10,15 @@ class customer:
         self.address = address
         self.phone = phone
 
-    def 
+    def generateOrders(n, amount):
+        for i in range(0, n):
+            cash[i] = ecash(amount, 
+
+    def splitSecret(m):
+        # generate random number
+        r = int(''.join(random.choices(string.digits, k = len(str(m)))))
+        s = m ^ r
+        return (r, s)
+
+    def commitBit(r):
+        
