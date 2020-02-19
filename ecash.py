@@ -7,7 +7,9 @@ class ecash:
     @param cid The customer ID
     @param sig The bank signature
     """
-    def __init__(self, amount, uid, cid, sig):
+    def __init__(self, amount, uid):
         self.amount = amount
-        self.cid = cid
-        self.sig = sig
+        self.uid = uid
+
+    def addPair(left, right):
+        id_pairs.append((left, right))
