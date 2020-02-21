@@ -1,6 +1,4 @@
 class ecash:
-    id_pairs = []
-
     """
     @param amount The value of the transaction
     @param uid The uniqueness string number
@@ -10,6 +8,7 @@ class ecash:
     def __init__(self, amount, uid):
         self.amount = amount
         self.uid = uid
+        self.id_pairs = []
 
-    def addPair(left, right):
-        id_pairs.append((left, right))
+    def addPair(self, left, right):
+        self.id_pairs.append((left, right))
