@@ -1,12 +1,13 @@
 import random
-from Crypto.PubKey import RSA
+from Crypto.PublicKey import RSA
 
 class bank:
     def __init__(self):
         self.past_ids = [] # past ecash uids
         self.accounts = [] # contains the user accounts
         self.pr = RSA.generate(2048)
-        self.pu = pr.publickey()
+        self.pu = self.pr.publickey()
+        self.order_to_sign = None
 
     def addAccount(self, name, amount):
         self.accounts.append({name : amount})
@@ -22,7 +23,7 @@ class bank:
     def validateCustomerOrders(self, orders):
         # remove secret order from the n-1 to validate
         secret_index = orders[1]
-        secret_order = orders[0][secret_index] 
+        self.order_to_sign = orders[0][secret_index] 
         validate = []
         j = 0
         value = 0
@@ -51,3 +52,6 @@ class bank:
             j += 1
 
         return True
+
+    def signOrder():
+        return self.pr.sign(self.order_to_sign, self.pr.n)[0]
