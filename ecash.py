@@ -12,3 +12,6 @@ class ecash:
 
     def addPair(self, left, right):
         self.id_pairs.append((left, right))
+
+    def toString(self):
+        return str(self.amount) + ", " + str(self.uid)
