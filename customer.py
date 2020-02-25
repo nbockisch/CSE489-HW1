@@ -24,6 +24,7 @@ class customer:
 
         # Generate a customer ID
         self.cid = self.name + ", " + self.address + ", " + self.phone
+        self.secret = 0
 
     def genBits(self, length):
         return int(''.join(rand.choices(string.digits, k = length)))
@@ -61,13 +62,27 @@ class customer:
 
     def sendOrdersToBank(self):
         # unblind N - 1 orders
-        secret = rand.randint(0, len(self.blinded))
+        self.secret = rand.randint(0, len(self.blinded))
         orders = []
 
         for i in range(0, len(self.blinded)):
-            if i != secret:
+            if i != self.secret:
                 orders.append(self.unblind(self.blinded[i], self.b_fac[i]))
             else:
                 orders.append(self.blinded[i])
 
-        return (orders, secret)
+        return (orders, self.secret)
+
+    def revealStrings(self, reveal_string):
+        tmp = ""
+        i = 0
+        
+        for c in reveal_string:
+             if c == "1":
+                 tmp += str(self.cash_ids[self.secret][0][1][i])
+             elif c == "0":
+                 tmp += str(self.cash_ids[self.secret][0][0][i])
+
+             i += 1
+                 
+        return tmp 
