@@ -44,11 +44,8 @@ class customer:
     def splitSecret(self):
         # generate random number
         r = str(''.join(rand.choices(string.digits, k = len(self.cid))))
-        s = ''
-
-        for i in range(0, len(self.cid)):
-            s += str(self.cid.encode('utf-8')[i] ^ r.encode('utf-8')[i])
-
+        s = ''.join(chr(ord(a) ^ ord(b)) for a, b in zip(r, self.cid)) 
+        
         return (r, s)
 
     def commitBit(self, r):
@@ -79,9 +76,9 @@ class customer:
         
         for c in reveal_string:
              if c == "1":
-                 tmp += str(self.cash_ids[self.secret][0][1][i])
+                 tmp += str(self.cash_ids[self.secret][self.secret][1][i])
              elif c == "0":
-                 tmp += str(self.cash_ids[self.secret][0][0][i])
+                 tmp += str(self.cash_ids[self.secret][self.secret][0][i])
 
              i += 1
                  

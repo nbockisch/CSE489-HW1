@@ -10,6 +10,8 @@ class bank:
         self.order_to_sign = None
         self.id_strings = None
         self.order_index = None
+        self.save_order = None
+        self.secret_index = 0
 
     def addAccount(self, name, amount):
         self.accounts.append({name : amount})
@@ -29,16 +31,16 @@ class bank:
 
     def validateCustomerOrders(self, orders, id_strings):
         # remove secret order from the n-1 to validate
-        secret_index = orders[1]
-        self.id_strings = id_strings[secret_index]
-        self.order_to_sign = orders[0][secret_index] 
-        self.order_index = secret_index
+        self.secret_index = orders[1]
+        self.id_strings = id_strings[self.secret_index]
+        self.order_to_sign = orders[0][self.secret_index] 
+        self.order_index = self.secret_index
         validate = []
         j = 0
         value = 0
 
         for i in range(0, len(orders[0])):
-            if (i != secret_index):
+            if (i != self.secret_index):
                 validate.append(orders[0][i])
 
         for val in validate:
@@ -50,6 +52,7 @@ class bank:
 
             # check ecash uid
             if tmp[1] in self.past_ids:
+                print("Duplicate ID, customer cheated: " + ''.join(chr(ord(a) ^ ord(b)) for a, b in zip(id_strings[self.secret_index][0][0], id_strings[self.secret_index][0][1])))
                 return False
             else:
                 self.past_ids.append(tmp[1])
@@ -66,33 +69,36 @@ class bank:
         # validate signature
         if self.pu.verify(order, (self.signOrder(order), )):
             uid = order.decode('utf-8').split(", ")[1]
+            if self.save_order == None:
+                self.save_order = order
+            else:
+                self.past_ids.append(uid)
+
             if uid in self.past_ids:
                 # reject if uid already in past database
                 print("Double spending alert!")
-                order_id_string = self.id_strings[self.order_index]
+                order_id_string = self.id_strings[self.secret_index]
                 i = 0
 
                 for c in bit_rev_string:
                     if c == "1":
-                        if order_id_string[0][1][i] != merch_id_string[i]:
-                            print("Customer cheated!")
-                            customer_id = order_id_string[0][1] ^ order_id_string[0][0]
-                            print("Customer: " + str(customer_id))
-                            break
+                        if order_id_string[1][i] != merch_id_string[i]:
+                            print("Different ID strings, customer cheated: " + ''.join(chr(ord(a) ^ ord(b)) for a, b in zip(self.id_strings[self.secret_index][0], self.id_strings[self.secret_index][1])))
+                            return False
                     elif c == "0":
-                        if order_id_string[0][0][i] != merch_id_string[i]:
-                            print("Customer cheated!")
-                            customer_id = order_id_string[0][1] ^ order_id_string[0][0]
-                            print("Customer: " + str(customer_id))
-                            break
+                        if order_id_string[0][i] != merch_id_string[i]:
+                            print("Different ID strings, customer cheated: " + ''.join(chr(ord(a) ^ ord(b)) for a, b in zip(self.id_strings[self.secret_index][0], self.id_strings[self.secret_index][1])))
+                            return False
 
                     i += 1
 
-                print("Merchant cheated!")
+                print("Same ID strings, merchant cheated.")
+                return False
 
             else:
                 self.modifyBalance("Bob", int(order.decode('utf-8').split(", ")[0]))
                 self.past_ids.append(uid)
+                return True
                 
     def signOrder(self, order):
         return self.pr.sign(order, self.pr.n)[0]
